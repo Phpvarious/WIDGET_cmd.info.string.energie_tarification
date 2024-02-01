@@ -2,7 +2,7 @@
 <!-- ################ Energie Tarification ################ 
   Widget name : cmd.info.string.energie_tarification
   Author : Phpvarious
-  Last Uptade : 2024/02/01 18h40 - Phpvarious
+  Last Uptade : 2024/02/01 21h40 - Phpvarious
   Lien : https://phpvarious.github.io/documentation/widget/fr_FR/widget_scenario/energie_tarification/
 -->
   <template>
@@ -35,6 +35,10 @@
     <div>///////////////// Type 2 /////////////////</div>
     <div>│───────────── HP ────────────│────── HC ──────│</div>
     <div>6h ────────────────────────── 22h ───────────── 6h </div>
+    <div>&nbsp;</div>
+    <div>///////////////// Type 3 /////////////////</div>
+    <div>│───────────── HP ────────────│────── HC ──────│</div>
+    <div>6h30 ─────────────────────── 22h30 ──────────── 6h30 </div>
   </template>
   
   <div id="typeBar#id#" class="graph#id#" style="margin: 10px;text-align: left;">
@@ -95,7 +99,7 @@
       if ('#hideBar#' == 1) cmd.querySelector('.graph#id#').style.display = 'none'
       else cmd.querySelector('.graph#id#').style.display = ''
     } 
-    var type#id# = (is_numeric('#type#') && ('#type#' == 2 || '#type#' == 1 || '#type#' == 0)) ? '#type#' : 0;
+    var type#id# = (is_numeric('#type#') && ('#type#' == 3 || '#type#' == 2 || '#type#' == 1 || '#type#' == 0)) ? '#type#' : 0;
     document.getElementById("typeBar#id#")?.classList.add('type' + type#id# + '_#id#')
     if (debug#id#) console.log('| type : ' + type#id#)
     if (type#id# == 1) {
@@ -114,6 +118,15 @@
       document.getElementById('bar3_#id#').remove()
       document.getElementById('bar4_#id#').remove()
     }
+    else if (type#id# == 3) { // tempo
+      document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '6h30'
+      document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '22h30'
+      document.querySelectorAll('.day#id#.day-grid#id# div')[2].innerHTML = '6h30'
+      document.querySelectorAll('.day#id#.day-grid#id# div')[3].style.display = 'none'
+      document.querySelectorAll('.day#id#.day-grid#id# div')[4].style.display = 'none'
+      document.getElementById('bar3_#id#').remove()
+      document.getElementById('bar4_#id#').remove()
+    }
     else {
       document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '7h'
       document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '23h'
@@ -126,7 +139,7 @@
       if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] en debug [getTime()] ───────────────')
       let date = new Date();
       let hours = date.getHours();
-      //hours = 15;
+      //hours = 15
       let minutes = date.getMinutes();
       //minutes = 00
       let seconds = date.getSeconds();
@@ -150,6 +163,10 @@
       }
       else if (type#id# == 2) {
         if(hoursDec >= 6) posx = hours - 6;
+        else posx = 17 + hours;
+      }
+      else if (type#id# == 3) {
+        if(hoursDec >= 6.5) posx = hours - 6.5;
         else posx = 17 + hours;
       }
       else { // type = 0
@@ -194,7 +211,7 @@
           nextLabel = 'label-hp#id#'
         }
       }
-      else if (type#id# == 2) {
+      else if (type#id# == 2 || type#id# == 3) {
         if (posx < 16) {
           txt = 'Heures Pleines'
           label = 'label-hp#id#'
@@ -479,31 +496,31 @@
       border-right-width: 0px;
     }
     /* type 2 */
-    .type2_#id# #bar1_#id# {
+    .type2_#id# #bar1_#id#, .type3_#id# #bar1_#id# {
       background-color: var(--color-hp#id#);
       color: var(--color-txt-hp#id#);
       width: calc(var(--width#id#) * 16);
       border-radius: var(--border-radius#id#) 0px 0px var(--border-radius#id#);
     }
-    .type2_#id# #bar2_#id# {
+    .type2_#id# #bar2_#id#, .type3_#id# #bar2_#id# {
       background-color: var(--color-hc#id#);
       color: var(--color-txt-hc#id#);
       width: calc(var(--width#id#) * 8);
       border-radius:  0px var(--border-radius#id#) var(--border-radius#id#) 0px;
     }
-    .type2_#id# .day-grid#id# div:nth-child(1){
+    .type2_#id# .day-grid#id# div:nth-child(1), .type3_#id# .day-grid#id# div:nth-child(1){
       left: 0px;
     }
-    .type2_#id# .day-grid#id# div:nth-child(2){
+    .type2_#id# .day-grid#id# div:nth-child(2), .type3_#id# .day-grid#id# div:nth-child(2){
       left: calc(var(--width#id#) * 16);
     }
-    .type2_#id# .day-grid#id# div:nth-child(3){
+    .type2_#id# .day-grid#id# div:nth-child(3), .type3_#id# .day-grid#id# div:nth-child(3){
       left: calc(var(--width#id#) * 24);
     }
-    .type2_#id# .bar#id#:nth-child(1) {
+    .type2_#id# .bar#id#:nth-child(1), .type3_#id# .bar#id#:nth-child(1) {
       border-right-width: 0px;
     }
-    .type2_#id# .bar#id#:nth-child(2) {
+    .type2_#id# .bar#id#:nth-child(2), .type3_#id# .bar#id#:nth-child(2) {
       border-left-width: 0px;
     }
   </style>
