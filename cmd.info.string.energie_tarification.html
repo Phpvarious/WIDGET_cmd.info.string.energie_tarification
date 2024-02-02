@@ -2,7 +2,7 @@
 <!-- ################ Energie Tarification ################ 
   Widget name : cmd.info.string.energie_tarification
   Author : Phpvarious
-  Last Uptade : 2024/02/02 07h20 - Phpvarious
+  Last Uptade : 2024/02/02 13h10 - Phpvarious
   Lien : https://phpvarious.github.io/documentation/widget/fr_FR/widget_scenario/energie_tarification/
 -->
   <template>
@@ -62,7 +62,7 @@
   
   <script>
     var debug#id# = ('#debug#' == 1) ? true : false;
-    var versionWidget#id# = '02/02/2024 07h20'
+    var versionWidget#id# = '02/02/2024 13h10'
     
     if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] Compatibilité V4.3 V4.4 [' + versionWidget#id# + '] ───────────────')
     /* Compatibilité V4.2 V4.3 V4.4 */
@@ -297,13 +297,14 @@
       if (debug#id# == 1) console.log('| value : ' + _options.value)
       if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
         cmd.querySelector(".iconSel#id#").classList.remove('error#id#')
-        if (_options.display_value.toLowerCase() == 'red' || _options.display_value.toLowerCase() == 'rouge'){
+        let value = _options.display_value.toLowerCase()
+        if (value.includes('red') || value.includes('rouge')){
           document.documentElement.style.setProperty('--color-tempo#id#', 'red')
         }
-        else if (_options.display_value.toLowerCase() == 'blue' || _options.display_value.toLowerCase() == 'bleu'){
+        else if (value.includes('blue') || value.includes('bleu')){
           document.documentElement.style.setProperty('--color-tempo#id#', 'blue')
         }
-        else if (_options.display_value.toLowerCase() == 'white' || _options.display_value.toLowerCase() == 'blanc'){
+        else if (value.includes('white') || value.includes('blanc')){
           document.documentElement.style.setProperty('--color-tempo#id#', 'white')
         }
         else {
