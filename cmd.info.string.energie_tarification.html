@@ -2,7 +2,7 @@
 <!-- ################ Energie Tarification ################ 
   Widget name : cmd.info.string.energie_tarification
   Author : Phpvarious
-  Last Uptade : 2024/02/01 21h40 - Phpvarious
+  Last Uptade : 2024/02/02 07h20 - Phpvarious
   Lien : https://phpvarious.github.io/documentation/widget/fr_FR/widget_scenario/energie_tarification/
 -->
   <template>
@@ -62,7 +62,7 @@
   
   <script>
     var debug#id# = ('#debug#' == 1) ? true : false;
-    var versionWidget#id# = '01/02/2024 21h40'
+    var versionWidget#id# = '02/02/2024 07h20'
     
     if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] Compatibilité V4.3 V4.4 [' + versionWidget#id# + '] ───────────────')
     /* Compatibilité V4.2 V4.3 V4.4 */
@@ -139,9 +139,9 @@
       if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] en debug [getTime()] ───────────────')
       let date = new Date();
       let hours = date.getHours();
-      //hours = 15
+      //hours = 1
       let minutes = date.getMinutes();
-      //minutes = 00
+      //minutes = 30
       let seconds = date.getSeconds();
       let numDay = date.getDate();
       let day = date.getDay();
@@ -162,16 +162,16 @@
         else posx = 16.5 + hours
       }
       else if (type#id# == 2) {
-        if(hoursDec >= 6) posx = hours - 6;
-        else posx = 17 + hours;
+        if(hoursDec >= 6) posx = hours - 6
+        else posx = 18 + hours
       }
       else if (type#id# == 3) {
-        if(hoursDec >= 6.5) posx = hours - 6.5;
-        else posx = 17 + hours;
+        if(hoursDec >= 6.5) posx = hours - 6.5
+        else posx = 17.5 + hours
       }
       else { // type = 0
-        if(hoursDec >= 7) posx = hours - 7 //if(hours >= 7) posx = hours - 7;
-        else posx = 17 + hours //else posx = 17 + hours;
+        if(hoursDec >= 7) posx = hours - 7
+        else posx = 17 + hours
       }
       
       posx = posx + (minutes / 60)
@@ -238,10 +238,10 @@
         }
         else if (posx < 19) {
           txt = 'Heures Creuses'
-          label = 'label-hc_#id#'
+          label = 'label-hc#id#'
           ecart = 19 - posx
           nextTxt = 'Heures Super Creuses'
-          nextLabel = 'label-hsc_#id#'
+          nextLabel = 'label-hsc#id#'
         }
         else if (posx < 23) {
           txt = 'Heures Super Creuses'
@@ -261,6 +261,7 @@
       
       ecartHours = Math.trunc(ecart)
       ecartMin = Math.round((ecart - ecartHours) * 60)
+      if (debug#id#) console.log('| ecart : ' + ecart)
       
       ecartTxt += weekday[day] + ' ' + numDay + ' ' + weekmonth[month] + ' ' + year + ' à ' + hours + ':' + minutes + ', dans '
       if(ecartHours > 0) ecartTxt += ecartHours + 'h'
