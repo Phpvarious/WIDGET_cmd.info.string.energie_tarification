@@ -22,8 +22,8 @@
     <div>noTempoInText : Masquer la bordure "tempo" sur la partie texte. </div>
     <div>noTempoInBar : Masquer la bordure "tempo" sur la partie barre. </div>
     <div>-----------------------------------------------------</div>
-    <div>timeslots : Définition des plages horaires. (défaut : 7h│23h│2h│6h)</div>
-    <div>labels : Définition des plages horaires. (défaut : 7h│23h│2h│6h)</div>
+    <div>timeslots : Définition des plages horaires. (défaut : 7h|23h|2h|6h)</div>
+    <div>labels : Définition des plages horaires. (défaut : HP|HC|HSC|HC)</div>
     <div>diagonalText : Angle de l'heure des plages horaires, ex : 45 pour 45 degrés d'inclinaison. (défaut : 0)</div>
     <div>&nbsp;</div>
     <div>//////////////////////////////////</div>
@@ -79,7 +79,7 @@
     /**/   jeedom.cmd.addUpdateFunction = function(id,func) { jeedom.cmd.update[id]=func; }
     /**/ }
     
-    const separators = '| '
+    var separators = '| '
     if ('#colorHc#' != '#'+'colorHc#') document.documentElement.style.setProperty('--color-hc#id#', '#colorHc#')
     if ('#colorHp#' != '#'+'colorHp#') document.documentElement.style.setProperty('--color-hp#id#', '#colorHp#')
     if ('#colorHsc#' != '#'+'colorHsc#') document.documentElement.style.setProperty('--color-hsc#id#', '#colorHsc#')
@@ -114,8 +114,8 @@
       else cmd.querySelector('.graph#id#').style.display = ''
     } 
     
-    var timeslots = '7h│23h│2h│6h'
-    var labels = 'HP│HC│HSC│HC'
+    var timeslots = '7h|23h|2h|6h'
+    var labels = 'HP|HC|HSC|HC'
     var labelsList = [
       { key: 'HP', data: { txt: 'Heures Pleines', label: 'label-hp#id#', bar:'bar-hp#id#' }},
       { key: 'HC', data: { txt: 'Heures Creuses', label: 'label-hc#id#', bar:'bar-hc#id#' }},
