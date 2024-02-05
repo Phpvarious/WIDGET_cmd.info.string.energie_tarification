@@ -60,13 +60,13 @@
     }
     
     function getTxt(key){
-      return labelsList.find(item => item.key === key).data.txt;
+      return labelsList.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList.find(item => item.key.toLowerCase() === key.toLowerCase()).data.txt:'Erreur'
     }
     function getLabel(key){
-      	return labelsList.find(item => item.key === key).data.label;
+      return labelsList.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList.find(item => item.key.toLowerCase() === key.toLowerCase()).data.label:'label-error#id#'
     }
     function getBar(key){
-      	return labelsList.find(item => item.key === key).data.bar;
+      return labelsList.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList.find(item => item.key.toLowerCase() === key.toLowerCase()).data.bar:'bar-error#id#'
     }
     
     var debug#id# = ('#debug#' == 1) ? true : false;
@@ -79,6 +79,7 @@
     /**/   jeedom.cmd.addUpdateFunction = function(id,func) { jeedom.cmd.update[id]=func; }
     /**/ }
     
+    const separators = '| '
     if ('#colorHc#' != '#'+'colorHc#') document.documentElement.style.setProperty('--color-hc#id#', '#colorHc#')
     if ('#colorHp#' != '#'+'colorHp#') document.documentElement.style.setProperty('--color-hp#id#', '#colorHp#')
     if ('#colorHsc#' != '#'+'colorHsc#') document.documentElement.style.setProperty('--color-hsc#id#', '#colorHsc#')
@@ -123,10 +124,10 @@
 
     if ('#timeslots#' != '#'+'timeslots#') timeslots = '#timeslots#'
     if ('#labels#' != '#'+'labels#') labels = '#labels#'
-    var timeslotsArray = timeslots.split('│')
+    var timeslotsArray = timeslots.split(new RegExp("[" + separators + "]"))
     var timeslotsIntArray = []
     var timeslotsDurationArray = []
-    var labelsArray = labels.split('│')
+    var labelsArray = labels.split(new RegExp("[" + separators + "]"))
 
 	var cssContent = document.styleSheets[0]
     var daysDiv = document.getElementById("days#id#")
@@ -148,7 +149,6 @@
       daysDiv.appendChild(dayDiv);
             
       let cssBar = "#bar" + (index+1) + "_#id# {";
-      cssBar += "background-color: var(--color-hp#id#);";
       cssBar += "color: var(--color-txt-hp#id#);";
       cssBar += "width: calc(var(--width#id#) * var(--duration" + (index+1) + "#id#));";
       cssBar += (index == 0)?"border-radius: var(--border-radius#id#) 0px 0px var(--border-radius#id#);":"";
@@ -171,7 +171,7 @@
         document.querySelectorAll('.day#id#.day-grid#id# div')[index].style.marginLeft = "0px"
       }
 
-      const timeslotSplit = timeslot.split('h');
+      const timeslotSplit = timeslot.split(/[hH]/);
       const hoursTimeslot = timeslotSplit[0];
       const minutesTimeslot = timeslotSplit[1];
       timeslotsIntArray[index] = parseInt(hoursTimeslot) + ((minutesTimeslot == '')?0:parseInt(minutesTimeslot)/60);
@@ -218,7 +218,7 @@
           currentDate += 24;
         }
       	
-      	return currentDate >= beginDate && currentDate <= endDate;
+      	return currentDate >= beginDate && currentDate < endDate;
     }
     
     log('└────────────────────────────────────')
@@ -266,10 +266,11 @@
             
       txt = getTxt(labelsArray[indexPos]);
       label = getLabel(labelsArray[indexPos]);
-      const nextTimeslot = (timeslotsIntArray[(indexPos+1)%iMax] > hoursDec)?timeslotsIntArray[(indexPos+1)%iMax]:timeslotsIntArray[(indexPos+1)%iMax] + 24;
+      const nextTimeslotIndex = (getLabel(labelsArray[indexPos]) === getLabel(labelsArray[(indexPos+1)%iMax]))?(indexPos+2)%iMax:(indexPos+1)%iMax
+      const nextTimeslot = (timeslotsIntArray[nextTimeslotIndex] > hoursDec)?timeslotsIntArray[nextTimeslotIndex]:timeslotsIntArray[nextTimeslotIndex] + 24;
       ecart = nextTimeslot - hoursDec
-      nextTxt = getTxt(labelsArray[(indexPos+1)%iMax]);
-      nextLabel = getLabel(labelsArray[(indexPos+1)%iMax]);
+      nextTxt = getTxt(labelsArray[nextTimeslotIndex]);
+      nextLabel = getLabel(labelsArray[nextTimeslotIndex]);
       
       ecartHours = Math.trunc(ecart)
       ecartMin = Math.round((ecart - ecartHours) * 60)
@@ -333,7 +334,7 @@
   <style>
     :root {
       --titleColor#id# : #ffffff;
-      --width#id# : 20px;
+      --width#id# : 22px;
       --posx#id# : 1;
       --border-radius#id# : 10px;
       --offsetWidth#id# : 9px;
@@ -349,16 +350,6 @@
       --color-tempo#id#: transparent;
       --color-tempo-text#id#: var(--color-tempo#id#);
       --color-tempo-bar#id#: var(--color-tempo#id#);
-      --duration1#id#: 16;
-      --duration2#id#: 3;
-      --duration3#id#: 4;
-      --duration4#id#: 1;
-      --duration5#id#: 16;
-      --duration6#id#: 3;
-      --duration7#id#: 4;
-      --duration8#id#: 1;
-      --duration9#id#: 1;
-      --duration10#id#: 1;
       --diagonal-text#id: Odeg;
     }
     .iconSel#id# {
@@ -377,6 +368,9 @@
     }
     .iconSel#id#.label-hsc#id#, .texte#id#.label-hsc#id# i {
       color: var(--color-hsc#id#);
+    }
+    .iconSel#id#.label-error#id#, .texte#id#.label-error#id# i {
+      color: transparent;
     }
     .iconSel#id#.selectorTempo#id#:not(.error#id#){
       color: var(--color-tempo#id#);
@@ -424,22 +418,37 @@
       background-color: var(--color-hsc#id#) !important;
       color: var(--color-txt-hsc#id#) !important;
     }
+
+    .texte#id# .bar-error#id#, .bar-error#id#,.texte#id# .label-error#id# {
+      background-size: 30px 30px;
+      background-image: linear-gradient(135deg, 
+        rgba(255, 0, 0, 0.5) 25%, 
+        rgba(255, 255, 255, 0.5) 25%, 
+        rgba(255, 255, 255, 0.5) 50%, 
+        rgba(255, 0, 0, 0.5) 50%, 
+        rgba(255, 0, 0, 0.5) 75%, 
+        rgba(255, 255, 255, 0.5) 75%, 
+        rgba(255, 255, 255, 0.5) 
+	);
+    }
     .radius#id#{
       border-radius: 0px var(--border-radius#id#) var(--border-radius#id#) 0px;
     }
     .type_#id# .day-grid#id# div:nth-child(1) {
       left: 0px;
     }
-    .type_#id# .bar#id#:nth-child(1) {
+    
+    .bar#id#:first-child {
       border-right-width: 0px;
     }
-    .type_#id# .bar#id#:nth-child(4) {
+    .bar#id#:last-child {
       border-left-width: 0px;
     }
-    .type_#id# .bar#id#:nth-child(2), .type_#id# .bar#id#:nth-child(3) {
+    .bar#id#:not(:first-child):not(:last-child) {
       border-left-width: 0px;
       border-right-width: 0px;
     }
+    
     .diagonal-text {
       transform: rotate(var(--diagonal-text#id#));
       transform-origin: 0 0;
