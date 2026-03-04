@@ -1,10 +1,10 @@
 <div class="cmd cmd-widget #history#" data-type="info" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#" data-version="#version#" data-eqLogic_id="#eqLogic_id#">
-<!-- ################ Energie Tarification ################ 
-  Widget name : cmd.info.string.energie_tarification
-  Author : Phpvarious
-  Last Uptade : 2024/02/02 13h10 - Phpvarious
-  Lien : https://phpvarious.github.io/documentation/widget/fr_FR/widget_scenario/energie_tarification/
--->
+  <!-- ################ Energie Tarification ################ 
+    Widget name : cmd.info.string.energie_tarification
+    Author : Phpvarious
+    Last Update : 2026/03/04 07h00 - Phpvarious
+    Lien : https://phpvarious.github.io/documentation/widget/fr_FR/widget_scenario/energie_tarification/
+  -->
   <template>
     <div>heightBar : Hauteur des barres  [ Exemple : 12, 14 ... | défaut : 12]</div>
     <div>stepWidth : Largueur des pas pour 1 heure [ Exemple : 20, 25 ... | défaut : 20]</div>
@@ -22,297 +22,303 @@
     <div>noTempoInText : Masquer la bordure "tempo" sur la partie texte. </div>
     <div>noTempoInBar : Masquer la bordure "tempo" sur la partie barre. </div>
     <div>-----------------------------------------------------</div>
-    <div>type : Type de tarification. (0, 1, 2 ou 3 | défaut : 0)</div>
+    <div>timeslots : Définition des plages horaires. (défaut : 7h|23h|2h|6h)</div>
+    <div>labels : Définition des plages horaires. (défaut : HP|HC|HSC|HC)</div>
+    <div>diagonalText : Angle de l'heure des plages horaires, ex : 45 pour 45 degrés d'inclinaison. (défaut : 0)</div>
     <div>&nbsp;</div>
-    <div>///////////////// Type 0 /////////////////</div>
+    <div>//////////////////////////////////</div>
     <div>│────── HP ──────│─── HC ──│──── HSC ────│── HC ──│</div>
     <div>7h ───────────── 23h ────── 2h ────────── 6h ───── 7h</div>
     <div>&nbsp;</div>
-    <div>///////////////// Type 1 /////////////////</div>
+    <div>//////////////////////////////////</div>
     <div>│──── HP ────│── HC ──│────── HP ─────│──── HC ───│</div>
     <div>7h30 ─────── 12h30 ─── 14h ──────────── 1h30 ────── 7h30</div>
     <div>&nbsp;</div>
-    <div>///////////////// Type 2 /////////////////</div>
+    <div>//////////////////////////////////</div>
     <div>│───────────── HP ────────────│────── HC ──────│</div>
     <div>6h ────────────────────────── 22h ───────────── 6h </div>
-    <div>&nbsp;</div>
-    <div>///////////////// Type 3 /////////////////</div>
-    <div>│───────────── HP ────────────│────── HC ──────│</div>
-    <div>6h30 ─────────────────────── 22h30 ──────────── 6h30 </div>
   </template>
   
-  <div id="typeBar#id#" class="graph#id#" style="margin: 10px;text-align: left;">
-    <div class="day#id#">
-      <span class="iconSel#id#" id="my-hour#id#">#name_display#</span>
+  <div id="typeBar#uid#" class="graph#uid# type_#uid#" style="margin: 10px;text-align: left;">
+    <div class="day#uid#">
+      <span class="iconSel#uid#" id="my-hour#uid#">#name_display#</span>
     </div>
-    <div>
-      <div id="bar1_#id#" class="bar#id# bar1_#id# bar-hp#id#" style=""></div>
-      <div id="bar2_#id#" class="bar#id# bar2_#id# bar-hc#id#" style=""></div>
-      <div id="bar3_#id#" class="bar#id# bar3_#id# bar-hsc#id#" style=""></div>
-      <div id="bar4_#id#" class="bar#id# bar4_#id# bar-hc2#id#" style=""></div>
+    <div id="content#uid#">
     </div>
-    <div class="day#id# day-grid#id#">
-      <div></div><div></div>
-      <div></div>
-      <div></div>
-      <div></div>
+    <div id="days#uid#" class="day#uid# day-grid#uid#">
     </div>
   </div>
-  <div class="day#id# texte#id#"></div>
+  <div class="day#uid# texte#uid#"></div>
   
   <script>
-    var debug#id# = ('#debug#' == 1) ? true : false;
-    var versionWidget#id# = '02/02/2024 13h10'
-    
-    if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] Compatibilité V4.3 V4.4 [' + versionWidget#id# + '] ───────────────')
-    /* Compatibilité V4.2 V4.3 V4.4 */
-    /**/ if (typeof jeedom.cmd.addUpdateFunction !== 'function') { // a partir de la 4.3
-    /**/   if (debug#id#) console.log('| jeedom.cmd.addUpdateFunction no exist')
-    /**/   jeedom.cmd.addUpdateFunction = function(id,func) { jeedom.cmd.update[id]=func; }
-    /**/ }
-    
-    if ('#colorHc#' != '#'+'colorHc#') document.documentElement.style.setProperty('--color-hc#id#', '#colorHc#')
-    if ('#colorHp#' != '#'+'colorHp#') document.documentElement.style.setProperty('--color-hp#id#', '#colorHp#')
-    if ('#colorHsc#' != '#'+'colorHsc#') document.documentElement.style.setProperty('--color-hsc#id#', '#colorHsc#')
-    if ('#colorTxtHc#' != '#'+'colorTxtHc#') document.documentElement.style.setProperty('--color-txt-hc#id#', '#colorTxtHc#')
-    if ('#colorTxtHp#' != '#'+'colorTxtHp#') document.documentElement.style.setProperty('--color-txt-hp#id#', '#colorTxtHp#')
-    if ('#colorTxtHsc#' != '#'+'colorTxtHsc#') document.documentElement.style.setProperty('--color-txt-hsc#id#', '#colorTxtHsc#')
-    if ('#sizeSelector#' != '#'+'sizeSelector#' && !isNaN('#sizeSelector#')) document.documentElement.style.setProperty('--size-selector#id#', '#sizeSelector#px')
-    if ('#heightBar#' != '#'+'heightBar#' && !isNaN('#heightBar#')) document.documentElement.style.setProperty('--height-bar#id#', '#heightBar#px')
-    if ('#radius#' != '#'+'radius#'  && !isNaN('#radius#')) document.documentElement.style.setProperty('--border-radius#id#', '#radius#px')
-    if ('#stepWidth#' != '#'+'stepWidth#'  && !isNaN('#stepWidth#')) document.documentElement.style.setProperty('--width#id#', '#stepWidth#px')
-    if ('#noTempoInText#' == '1') document.documentElement.style.setProperty('--color-tempo-text#id#', 'transparent')
-    if ('#noTempoInBar#' == '1') document.documentElement.style.setProperty('--color-tempo-bar#id#', 'transparent')
-    
-    var icone#id# = '#name_display#';
-    if(icone#id#.indexOf('<i ') === -1) {
-      icone#id# = '<i class="fas fa-map-marker-alt "></i>'
+    function log#uid#(text) {
+      if (debug#uid#) console.log(text)
     }
-    if (debug#id#) console.log('| icone : ' + icone#id#)
+    
+    function add0#uid#(val) {
+      return((val < 10) ? "0" : "") + val
+    }
+    
+    function getTxt#uid#(key) {
+      return labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase()).data.txt:'Erreur'
+    }
+    function getLabel#uid#(key) {
+      return labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase()).data.label:'label-error#uid#'
+    }
+    function getBar#uid#(key) {
+      return labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase())?labelsList#uid#.find(item => item.key.toLowerCase() === key.toLowerCase()).data.bar:'bar-error#uid#'
+    }
+    
+    var debug#uid# = ('#debug#' == 1) ? true : false;
+    var versionWidget#uid# = '2026/03/04 07h00'
+    
+    log#uid#('┌─────────────────── Widget Energie Tarification [#id#] Compatibilité V4.4 V4.5 [' + versionWidget#uid# + '] ───────────────')
+    
+    var separators#uid# = '| '
+    if ('#colorHc#' != '#'+'colorHc#') document.documentElement.style.setProperty('--color-hc#uid#', '#colorHc#')
+    if ('#colorHp#' != '#'+'colorHp#') document.documentElement.style.setProperty('--color-hp#uid#', '#colorHp#')
+    if ('#colorHsc#' != '#'+'colorHsc#') document.documentElement.style.setProperty('--color-hsc#uid#', '#colorHsc#')
+    if ('#colorTxtHc#' != '#'+'colorTxtHc#') document.documentElement.style.setProperty('--color-txt-hc#uid#', '#colorTxtHc#')
+    if ('#colorTxtHp#' != '#'+'colorTxtHp#') document.documentElement.style.setProperty('--color-txt-hp#uid#', '#colorTxtHp#')
+    if ('#colorTxtHsc#' != '#'+'colorTxtHsc#') document.documentElement.style.setProperty('--color-txt-hsc#uid#', '#colorTxtHsc#')
+    if ('#sizeSelector#' != '#'+'sizeSelector#' && !isNaN('#sizeSelector#')) document.documentElement.style.setProperty('--size-selector#uid#', '#sizeSelector#px')
+    if ('#heightBar#' != '#'+'heightBar#' && !isNaN('#heightBar#')) document.documentElement.style.setProperty('--height-bar#uid#', '#heightBar#px')
+    if ('#radius#' != '#'+'radius#'  && !isNaN('#radius#')) document.documentElement.style.setProperty('--border-radius#uid#', '#radius#px')
+    if ('#stepWidth#' != '#'+'stepWidth#'  && !isNaN('#stepWidth#')) document.documentElement.style.setProperty('--width#uid#', '#stepWidth#px')
+    if ('#noTempoInText#' == '1') document.documentElement.style.setProperty('--color-tempo-text#uid#', 'transparent')
+    if ('#noTempoInBar#' == '1') document.documentElement.style.setProperty('--color-tempo-bar#uid#', 'transparent')
+    var diagonalText#uid# = '0deg'
+    if ('#diagonalText#' != '#'+'diagonalText#' && !isNaN('#diagonalText#')) {
+      diagonalText#uid# = '#diagonalText#deg'
+    }
+    document.documentElement.style.setProperty('--diagonal-text#uid#', diagonalText#uid#)
+    
+    var icone#uid# = '#name_display#';
+    if (icone#uid#.indexOf('<i ') === -1) {
+      icone#uid# = '<i class="fas fa-map-marker-alt "></i>'
+    }
+    log#uid#('| icone : ' + icone#uid#)
     if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
-      cmd.querySelector('.iconSel#id#').innerHTML = icone#id#
-      document.documentElement.style.setProperty('--offsetWidth#id#', cmd.querySelector('.iconSel#id# i').offsetWidth + 'px')
+      cmd.querySelector('.iconSel#uid#').innerHTML = icone#uid#
+      document.documentElement.style.setProperty('--offsetWidth#uid#', cmd.querySelector('.iconSel#uid# i').offsetWidth + 'px')
       
-      if ('#hideTexte#' == 1) cmd.querySelector('.texte#id#').style.display = 'none'
-      else cmd.querySelector('.texte#id#').style.display = ''
+      if ('#hideTexte#' == 1) cmd.querySelector('.texte#uid#').style.display = 'none'
+      else cmd.querySelector('.texte#uid#').style.display = ''
       
-      if ('#hideBar#' == 1) cmd.querySelector('.graph#id#').style.display = 'none'
-      else cmd.querySelector('.graph#id#').style.display = ''
+      if ('#hideBar#' == 1) cmd.querySelector('.graph#uid#').style.display = 'none'
+      else cmd.querySelector('.graph#uid#').style.display = ''
     } 
-    var type#id# = (is_numeric('#type#') && ('#type#' == 3 || '#type#' == 2 || '#type#' == 1 || '#type#' == 0)) ? '#type#' : 0;
-    document.getElementById("typeBar#id#")?.classList.add('type' + type#id# + '_#id#')
-    if (debug#id#) console.log('| type : ' + type#id#)
-    if (type#id# == 1) {
-      document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '7h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '12h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[2].innerHTML = '14h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[3].innerHTML = '1h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[4].innerHTML = '7h30'
+    
+    var timeslots#uid# = '7h|23h|2h|6h'
+    var labels#uid# = 'HP|HC|HSC|HC'
+    var labelsList#uid# = [
+      { key: 'HP', data: { txt: 'Heures Pleines', label: 'label-hp#uid#', bar:'bar-hp#uid#' }},
+      { key: 'HC', data: { txt: 'Heures Creuses', label: 'label-hc#uid#', bar:'bar-hc#uid#' }},
+      { key: 'HSC', data: { txt: 'Heures Super Creuses', label: 'label-hsc#uid#', bar:'bar-hsc#uid#' }}
+    ];
+
+    if ('#timeslots#' != '#'+'timeslots#') timeslots#uid# = '#timeslots#'
+    if ('#labels#' != '#'+'labels#') labels#uid# = '#labels#'
+    var timeslotsArray#uid# = timeslots#uid#.split(new RegExp("[" + separators#uid# + "]"))
+    var timeslotsIntArray#uid# = []
+    var timeslotsDurationArray#uid# = []
+    var labelsArray#uid# = labels#uid#.split(new RegExp("[" + separators#uid# + "]"))
+
+	var cssContent#uid# = document.styleSheets[0]
+    var daysDiv#uid# = document.getElementById("days#uid#")
+    var dayDiv#uid# = document.createElement("div")
+    var cssDayGrid#uid# = ""
+    var durationId#uid# = ""
+    var durationValue#uid# = ""
+
+    timeslotsArray#uid#.map(function(timeslot, index) {
+      let contentDiv = document.getElementById("content#uid#")
+      let barDiv = document.createElement("div")
+      barDiv.id = "bar" + (index+1) + "_#uid#"
+      barDiv.classList.add("bar#uid#", "bar" + (index+1) + "_#uid#")
+      contentDiv.appendChild(barDiv)
+
+      daysDiv#uid# = document.getElementById("days#uid#")
+      dayDiv#uid# = document.createElement("div")
+      dayDiv#uid#.classList.add("diagonal-text#uid#")
+      daysDiv#uid#.appendChild(dayDiv#uid#)
+            
+      let cssBar = "#bar" + (index+1) + "_#uid# {"
+      cssBar += "color: var(--color-txt-hp#uid#);"
+      cssBar += "width: calc(var(--width#uid#) * var(--duration" + (index+1) + "#uid#));"
+      cssBar += (index == 0) ? "border-radius: var(--border-radius#uid#) 0px 0px var(--border-radius#uid#);" : ""
+      cssBar += "}"
+      cssContent#uid#.insertRule(cssBar, cssContent#uid#.cssRules.length)
+
+      if (index != 0) {
+        cssDayGrid#uid# = ".type_#uid# .day-grid#uid# div:nth-child(" + (index+1) + ") {"
+        cssDayGrid#uid# += "left: calc(var(--width#uid#) * ("
+        for (let i=1;i<(index+1);i++) {
+          cssDayGrid#uid# += "var(--duration" + i + "#uid#)"
+          cssDayGrid#uid# += (i != index) ? " + " : ""
+        }
+        cssDayGrid#uid# += "));}"
+        cssContent#uid#.insertRule(cssDayGrid#uid#, cssContent#uid#.cssRules.length)
+      }
+
+      document.querySelectorAll('.day#uid#.day-grid#uid# div')[index].innerHTML = timeslot
+      if (diagonalText#uid# != '0deg') {
+        document.querySelectorAll('.day#uid#.day-grid#uid# div')[index].style.marginLeft = "0px"
+      }
+
+      const timeslotSplit = timeslot.split(/[hH]/)
+      const hoursTimeslot = timeslotSplit[0]
+      const minutesTimeslot = timeslotSplit[1]
+      timeslotsIntArray#uid#[index] = parseInt(hoursTimeslot) + ((minutesTimeslot == '') ? 0 : parseInt(minutesTimeslot)/60)
+      if (index != 0) {
+        durationId#uid# = '--duration' + index + '#uid#';
+      	durationValue#uid# = (timeslotsIntArray#uid#[index] > timeslotsIntArray#uid#[index-1])? (timeslotsIntArray#uid#[index] - timeslotsIntArray#uid#[index-1]):(24 - timeslotsIntArray#uid#[index-1] + timeslotsIntArray#uid#[index])
+      	timeslotsDurationArray#uid#[index-1] = durationValue#uid#
+        document.documentElement.style.setProperty(durationId#uid#, durationValue#uid#)
+      }
+    })
+    
+    daysDiv#uid# = document.getElementById("days#uid#")
+    dayDiv#uid# = document.createElement("div")
+    dayDiv#uid#.classList.add("diagonal-text#uid#")
+    daysDiv#uid#.appendChild(dayDiv#uid#)
+
+    cssDayGrid#uid# = ".type_#uid# .day-grid#uid# div:nth-child(" + (timeslotsArray#uid#.length+1) + ") {"
+    cssDayGrid#uid# += "	left: calc(var(--width#uid#) * 24);"
+    cssDayGrid#uid# += "}"
+    cssContent#uid#.insertRule(cssDayGrid#uid#, cssContent#uid#.cssRules.length)
+
+    labelsArray#uid#.map(function(label, index) {
+      cmd.querySelector('#bar' +(index+1) + '_#uid#').classList.remove('bar-hp#uid#','bar-hc#uid#','bar-hsc#uid#')
+      cmd.querySelector('#bar' +(index+1) + '_#uid#').classList.add(getBar#uid#(label))
+    })
+    
+    durationId#uid# = '--duration' + timeslotsArray#uid#.length + '#uid#'
+    durationValue#uid# = (timeslotsIntArray#uid#[0] > timeslotsIntArray#uid#[timeslotsArray#uid#.length-1])? (timeslotsIntArray#uid#[0] - timeslotsIntArray#uid#[timeslotsArray#uid#.length-1]):(24 - timeslotsIntArray#uid#[timeslotsArray#uid#.length-1] + timeslotsIntArray#uid#[0])
+    timeslotsDurationArray#uid#[timeslotsArray#uid#.length-1] = durationValue#uid#
+    document.documentElement.style.setProperty(durationId#uid#, durationValue#uid#)
+
+    document.querySelectorAll('.day#uid#.day-grid#uid# div')[timeslotsArray#uid#.length].innerHTML = timeslotsArray#uid#[0]
+    if (diagonalText#uid# != '0deg') {
+      document.querySelectorAll('.day#uid#.day-grid#uid# div')[timeslotsArray#uid#.length].style.marginLeft = "0px"
     }
-    else if (type#id# == 2) { // tempo
-      document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '6h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '22h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[2].innerHTML = '6h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[3].style.display = 'none'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[4].style.display = 'none'
-      document.getElementById('bar3_#id#').remove()
-      document.getElementById('bar4_#id#').remove()
+    
+    document.getElementById('bar' + timeslotsArray#uid#.length + '_#uid#').classList.add('radius#uid#')
+
+    function isCurrentTimeslot#uid#(currentDate, beginDate, endDate) {
+      	if (beginDate > endDate) {
+          endDate += 24
+        }
+      	if (beginDate > currentDate) {
+          currentDate += 24
+        }
+      	
+      	return currentDate >= beginDate && currentDate < endDate;
     }
-    else if (type#id# == 3) { // tempo
-      document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '6h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '22h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[2].innerHTML = '6h30'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[3].style.display = 'none'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[4].style.display = 'none'
-      document.getElementById('bar3_#id#').remove()
-      document.getElementById('bar4_#id#').remove()
-    }
-    else {
-      document.querySelectorAll('.day#id#.day-grid#id# div')[0].innerHTML = '7h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[1].innerHTML = '23h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[2].innerHTML = '2h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[3].innerHTML = '6h'
-      document.querySelectorAll('.day#id#.day-grid#id# div')[4].innerHTML = '7h'
-    }
-    if (debug#id#) console.log('└────────────────────────────────────')
-    function getTime#id# () {
-      if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] en debug [getTime()] ───────────────')
+    log#uid#('└────────────────────────────────────')
+    
+    function getTime#uid#() {
+      log#uid#('┌─────────────────── Widget Energie Tarification [#id#] en debug [getTime()] ───────────────')
       let date = new Date();
-      let hours = date.getHours();
+      let hours = date.getHours()
       //hours = 1
-      let minutes = date.getMinutes();
+      let minutes = date.getMinutes()
       //minutes = 30
-      let seconds = date.getSeconds();
-      let numDay = date.getDate();
-      let day = date.getDay();
-      let month = date.getMonth();
-      let year = date.getFullYear();
-      let weekday = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
-      let weekmonth = ["Janvier","Février","Mars","Avril","Mais","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"];
+      let seconds = date.getSeconds()
+      let numDay = date.getDate()
+      let day = date.getDay()
+      let month = date.getMonth()
+      let year = date.getFullYear()
+      let weekday = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"]
+      let weekmonth = ["Janvier","Février","Mars","Avril","Mais","Juin","Juillet","Aout","Septembre","Octobre","Novembre","Décembre"]
       let label, txt, nextTxt, nextLabel, ecartMin, ecart, ecartHours
       let ecartTxt = ''
       let ecartTitle = ''
       let posx = 0
-      let myHour#id# = document.getElementById("my-hour#id#")
-      let hoursDec = hours + ( minutes / 60 )
+      let myHour = document.getElementById("my-hour#uid#")
+      const hoursDec = hours + ( minutes / 60 )
+            
+      log#uid#('| hoursDec : ' + hoursDec)
+      if (hoursDec >= timeslotsIntArray#uid#[0]) posx = hoursDec - timeslotsIntArray#uid#[0]
+      else posx = 24 - timeslotsIntArray#uid#[0] + hoursDec
+            
+      log#uid#('| posx : ' + posx)
+      hours = add0#uid#(hours)
+      minutes = add0#uid#(minutes)
+      seconds = add0#uid#(seconds)
+      numDay = add0#uid#(numDay)
       
-      if (debug#id#) console.log('| hoursDec : ' + hoursDec)
-      if(type#id# == 1) {
-        if(hoursDec >= 7.5) posx = hours - 7.5
-        else posx = 16.5 + hours
-      }
-      else if (type#id# == 2) {
-        if(hoursDec >= 6) posx = hours - 6
-        else posx = 18 + hours
-      }
-      else if (type#id# == 3) {
-        if(hoursDec >= 6.5) posx = hours - 6.5
-        else posx = 17.5 + hours
-      }
-      else { // type = 0
-        if(hoursDec >= 7) posx = hours - 7
-        else posx = 17 + hours
-      }
+      const iMax = labelsArray#uid#.length
+      let indexPos = iMax-1
+      let indexTimesolt = 0
       
-      posx = posx + (minutes / 60)
-      if (debug#id#) console.log('| posx : ' + posx)
-      hours = ((hours < 10) ? "0" : "") + hours;
-      minutes = ((minutes < 10) ? "0" : "") + minutes;
-      seconds = ((seconds < 10) ? "0" : "") + seconds;
-      numDay = ((numDay < 10) ? "0" : "") + numDay;
-      
-      if(type#id# == 1) {
-        if (posx < 5) {
-          txt = 'Heures Pleines'
-          label = 'label-hp#id#'
-          ecart = 5 - posx
-          nextTxt = 'Heures Creuses'
-          nextLabel = 'label-hc#id#'
-        }
-        else if (posx < 6.5) {
-          txt = 'Heures Creuses'
-          label = 'label-hc#id#'
-          ecart = 6.5 - posx
-          nextTxt = 'Heures Pleines'
-          nextLabel = 'label-hp#id#'
-        }
-        else if (posx < 18) {
-          txt = 'Heures Pleines'
-          label = 'label-hp#id#'
-          ecart = 18 - posx
-          nextTxt = 'Heures Creuses'
-          nextLabel = 'label-hc#id#'
-        }
-        else {
-          txt = 'Heures Creuses'
-          label = 'label-hc#id#'
-          ecart = 24 - posx
-          nextTxt = 'Heures Pleines'
-          nextLabel = 'label-hp#id#'
+      for (let i=0 ; i<iMax ; i++) {
+        if (isCurrentTimeslot#uid#(hoursDec, timeslotsIntArray#uid#[i], timeslotsIntArray#uid#[(i+1)%iMax])) {
+          indexPos = i
+          break;
         }
       }
-      else if (type#id# == 2 || type#id# == 3) {
-        if (posx < 16) {
-          txt = 'Heures Pleines'
-          label = 'label-hp#id#'
-          ecart = 16 - posx
-          nextTxt = 'Heures Creuses'
-          nextLabel = 'label-hc#id#'
-        }
-        else {
-          txt = 'Heures Creuses'
-          label = 'label-hc#id#'
-          ecart = 24 - posx
-          nextTxt = 'Heures Pleines'
-          nextLabel = 'label-hp#id#'
-        }
-      }
-      else
-      {  // type = 0
-        if (posx < 16) {
-          txt = 'Heures Pleines'
-          label = 'label-hp#id#'
-          ecart = 16 - posx
-          nextTxt = 'Heures Creuses'
-          nextLabel = 'label-hc#id#'
-        }
-        else if (posx < 19) {
-          txt = 'Heures Creuses'
-          label = 'label-hc#id#'
-          ecart = 19 - posx
-          nextTxt = 'Heures Super Creuses'
-          nextLabel = 'label-hsc#id#'
-        }
-        else if (posx < 23) {
-          txt = 'Heures Super Creuses'
-          label = 'label-hsc#id#'
-          ecart = 23 - posx
-          nextTxt = 'Heures Creuses'
-          nextLabel = 'label-hc#id#'
-        }
-        else {
-          txt = 'Heures Creuses'
-          label = 'label-hc#id#'
-          ecart = 24 - posx
-          nextTxt = 'Heures Pleines'
-          nextLabel = 'label-hp#id#'
-        }
-      }
+            
+      txt = getTxt#uid#(labelsArray#uid#[indexPos])
+      label = getLabel#uid#(labelsArray#uid#[indexPos])
+      const nextTimeslotIndex = (getLabel#uid#(labelsArray#uid#[indexPos]) === getLabel#uid#(labelsArray#uid#[(indexPos+1)%iMax]))?(indexPos+2)%iMax:(indexPos+1)%iMax
+      const nextTimeslot = (timeslotsIntArray#uid#[nextTimeslotIndex] > hoursDec)?timeslotsIntArray#uid#[nextTimeslotIndex]:timeslotsIntArray#uid#[nextTimeslotIndex] + 24
+      ecart = nextTimeslot - hoursDec
+      nextTxt = getTxt#uid#(labelsArray#uid#[nextTimeslotIndex])
+      nextLabel = getLabel#uid#(labelsArray#uid#[nextTimeslotIndex])
       
       ecartHours = Math.trunc(ecart)
       ecartMin = Math.round((ecart - ecartHours) * 60)
-      if (debug#id#) console.log('| ecart : ' + ecart)
+      log#uid#('| ecart : ' + ecart)
       
       ecartTxt += weekday[day] + ' ' + numDay + ' ' + weekmonth[month] + ' ' + year + ' à ' + hours + ':' + minutes + ', dans '
-      if(ecartHours > 0) ecartTxt += ecartHours + 'h'
-      if(ecartMin > 0) ecartTxt += ((ecartMin < 10) ? "0" : "") + ecartMin + ' min'
+      if (ecartHours > 0) ecartTxt += ecartHours + 'h'
+      if (ecartMin > 0) ecartTxt += add0#uid#(ecartMin) + ' min'
       ecartTitle = ecartTxt + ', je serai en ' + nextTxt
       ecartTxt += ', je serai en <span class="label ' + nextLabel + '">' + nextTxt + '</span>'
       
       if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
-        cmd.querySelector('.texte#id#').innerHTML = '<span class="iconTxt#id#"><i class="fa fa-circle fa-lg"></i></span> ' + ecartTxt
-        cmd.querySelector('.iconSel#id#').setAttribute('title', ecartTitle)
-        cmd.querySelector(".iconSel#id#").classList.remove('label-hp#id#','label-hc#id#','label-hsc#id#')
-        cmd.querySelector(".texte#id#").classList.remove('label-hp#id#','label-hc#id#','label-hsc#id#')
-        cmd.querySelector(".texte#id#").classList.add(label)
-        cmd.querySelector('.iconTxt#id#').setAttribute('title', txt)
+        cmd.querySelector('.texte#uid#').innerHTML = '<span class="iconTxt#uid#"><i class="fa fa-circle fa-lg"></i></span> ' + ecartTxt
+        cmd.querySelector('.iconSel#uid#').setAttribute('title', ecartTitle)
+        cmd.querySelector(".iconSel#uid#").classList.remove('label-hp#uid#','label-hc#uid#','label-hsc#uid#')
+        cmd.querySelector(".texte#uid#").classList.remove('label-hp#uid#','label-hc#uid#','label-hsc#uid#')
+        cmd.querySelector(".texte#uid#").classList.add(label)
+        cmd.querySelector('.iconTxt#uid#').setAttribute('title', txt)
         if ('#colorSelector#' == 'tarif' ) {
-          cmd.querySelector(".iconSel#id#").classList.add(label)
+          cmd.querySelector(".iconSel#uid#").classList.add(label)
         }
         else if ('#colorSelector#' == 'tempo') {
-          cmd.querySelector(".iconSel#id#").classList.add('selectorTempo#id#')
+          cmd.querySelector(".iconSel#uid#").classList.add('selectorTempo#uid#')
+        }
+        if (myHour) {
+          document.documentElement.style.setProperty('--posx#uid#', posx)
+          setTimeout("getTime#uid#()",60000)
         }
       }
       
-      if (myHour#id#) {
-        document.documentElement.style.setProperty('--posx#id#', posx)
-        setTimeout("getTime#id#()",60000)
-      }
-      if (debug#id#) console.log('└────────────────────────────────────')
+
+      log#uid#('└────────────────────────────────────')
     }
-    getTime#id#()
+    getTime#uid#()
     
     jeedom.cmd.addUpdateFunction('#id#', function(_options) {
-      if (debug#id#) console.log('┌─────────────────── Widget Energie Tarification [#id#] en debug [addUpdateFunction()] ───────────────')
-      if (debug#id# == 1) console.log('| value : ' + _options.value)
       if (is_object(cmd = document.querySelector('.cmd[data-cmd_uid="#uid#"]'))) {
-        cmd.querySelector(".iconSel#id#").classList.remove('error#id#')
+        log#uid#('┌─────────────────── Widget Energie Tarification [#id#] en debug [addUpdateFunction()] ───────────────')
+        log#uid#('| value : ' + _options.value)
+        cmd.querySelector(".iconSel#uid#").classList.remove('error#uid#')
         let value = _options.display_value.toLowerCase()
-        if (value.includes('red') || value.includes('rouge')){
-          document.documentElement.style.setProperty('--color-tempo#id#', 'red')
+        if (value.includes('red') || value.includes('rouge')) {
+          document.documentElement.style.setProperty('--color-tempo#uid#', 'red')
+        } else if (value.includes('blue') || value.includes('bleu')) {
+          document.documentElement.style.setProperty('--color-tempo#uid#', 'blue')
+        } else if (value.includes('white') || value.includes('blanc')) {
+          document.documentElement.style.setProperty('--color-tempo#uid#', 'white')
+        } else {
+          document.documentElement.style.setProperty('--color-tempo#uid#', 'transparent')
+          cmd.querySelector(".iconSel#uid#").classList.add('error#uid#')
         }
-        else if (value.includes('blue') || value.includes('bleu')){
-          document.documentElement.style.setProperty('--color-tempo#id#', 'blue')
-        }
-        else if (value.includes('white') || value.includes('blanc')){
-          document.documentElement.style.setProperty('--color-tempo#id#', 'white')
-        }
-        else {
-          document.documentElement.style.setProperty('--color-tempo#id#', 'transparent')
-          cmd.querySelector(".iconSel#id#").classList.add('error#id#')
-        }
+        log#uid#('└────────────────────────────────────')
       }
-      if (debug#id#) console.log('└────────────────────────────────────')
     })
     
     jeedom.cmd.refreshValue([{ cmd_id: '#id#', value: '#value#', display_value: '#state#', valueDate: '#valueDate#', collectDate: '#collectDate#', alertLevel: '#alertLevel#', unit: '#unite#' }])
@@ -320,68 +326,72 @@
   
   <style>
     :root {
-      --titleColor#id# : #ffffff;
-      --width#id# : 20px;
-      --posx#id# : 1;
-      --border-radius#id# : 10px;
-      --offsetWidth#id# : 9px;
-      --color-hc#id# : var(--al-success-color);
-      --color-txt-hc#id# : var(--sc-lightTxt-color);
-      --color-hp#id# : var(--al-warning-color);
-      --color-txt-hp#id# : var(--sc-lightTxt-color);
-      --color-hsc#id# : var(--lb-info-color);
-      --color-txt-hsc#id# : var(--sc-lightTxt-color);
-      --color-icone#id# : var(--link-color);
-      --size-selector#id#: 18px;
-      --height-bar#id#: 12px;
-      --color-tempo#id#: transparent;
-      --color-tempo-text#id#: var(--color-tempo#id#);
-      --color-tempo-bar#id#: var(--color-tempo#id#);
+      --titleColor#uid# : #ffffff;
+      --width#uid# : 22px;
+      --posx#uid# : 1;
+      --border-radius#uid# : 10px;
+      --offsetWidth#uid# : 9px;
+      --color-hc#uid# : var(--al-success-color);
+      --color-txt-hc#uid# : var(--sc-lightTxt-color);
+      --color-hp#uid# : var(--al-warning-color);
+      --color-txt-hp#uid# : var(--sc-lightTxt-color);
+      --color-hsc#uid# : var(--lb-info-color);
+      --color-txt-hsc#uid# : var(--sc-lightTxt-color);
+      --color-icone#uid# : var(--link-color);
+      --size-selector#uid#: 18px;
+      --height-bar#uid#: 12px;
+      --color-tempo#uid#: transparent;
+      --color-tempo-text#uid#: var(--color-tempo#uid#);
+      --color-tempo-bar#uid#: var(--color-tempo#uid#);
+      --diagonal-text#uid#: Odeg;
     }
-    .iconSel#id# {
+    .iconSel#uid# {
       position: relative;
-      left: calc(var(--posx#id#) * var(--width#id#) - (var(--offsetWidth#id#) / 2));
-      color: var(--color-icone#id#);
+      left: calc(var(--posx#uid#) * var(--width#uid#) - (var(--offsetWidth#uid#) / 2));
+      color: var(--color-icone#uid#);
     }
-    .iconSel#id# > i {
-      font-size: var(--size-selector#id#);
+    .iconSel#uid# > i {
+      font-size: var(--size-selector#uid#);
     }
-    .iconSel#id#.label-hp#id#, .texte#id#.label-hp#id# i {
-      color: var(--color-hp#id#);
+    .iconSel#uid#.label-hp#uid#, .texte#uid#.label-hp#uid# i {
+      color: var(--color-hp#uid#);
     }
-    .iconSel#id#.label-hc#id#, .texte#id#.label-hc#id# i {
-      color: var(--color-hc#id#);
+    .iconSel#uid#.label-hc#uid#, .texte#uid#.label-hc#uid# i {
+      color: var(--color-hc#uid#);
     }
-    .iconSel#id#.label-hsc#id#, .texte#id#.label-hsc#id# i {
-      color: var(--color-hsc#id#);
+    .iconSel#uid#.label-hsc#uid#, .texte#uid#.label-hsc#uid# i {
+      color: var(--color-hsc#uid#);
     }
-    .iconSel#id#.selectorTempo#id#:not(.error#id#){
-      color: var(--color-tempo#id#);
+    .iconSel#uid#.label-error#uid#, .texte#uid#.label-error#uid# i {
+      color: transparent;
     }
-    .bar#id#{
-      height: var(--height-bar#id#);
+    .iconSel#uid#.selectorTempo#uid#:not(.error#uid#){
+      color: var(--color-tempo#uid#);
+    }
+    .bar#uid#{
+      height: var(--height-bar#uid#);
       float: left;
       display: block;
-      border: 3px solid var(--color-tempo-bar#id#);
+      border: 3px solid var(--color-tempo-bar#uid#);
     }
-    .day#id#{
-      width: calc(var(--width#id#) * 24);
+    .day#uid#{
+      width: calc(var(--width#uid#) * 24);
       position: relative;
       margin-bottom: 2px;
     }
-    .day-grid#id#{
+    .day-grid#uid#{
       margin: 2px 0 5px;
       height: 8px;
       display: inline-block;
     }
-    .texte#id#{
+    .texte#uid#{
       margin: 3px 10px 20px;
       padding: 5px;
       /* height: 8px; */
-      border: 3px solid var(--color-tempo-text#id#);
-      border-radius: var(--border-radius#id#);
+      border: 3px solid var(--color-tempo-text#uid#);
+      border-radius: var(--border-radius#uid#);
     }
-    .day-grid#id# div {
+    .day-grid#uid# div {
       position: absolute;
       display: block;
       width: 30px;
@@ -389,141 +399,50 @@
       font-size: 10px;
       text-align: center;
     }
-    .texte#id# .label-hp#id# {
-      background-color: var(--color-hp#id#);
-      color: var(--color-txt-hp#id#);
+    .texte#uid# .label-hp#uid#, .bar-hp#uid# {
+      background-color: var(--color-hp#uid#) !important;
+      color: var(--color-txt-hp#uid#) !important;
     }
-    .texte#id# .label-hc#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
+    .texte#uid# .label-hc#uid#, .bar-hc#uid# {
+      background-color: var(--color-hc#uid#) !important;
+      color: var(--color-txt-hc#uid#) !important;
     }
-    .texte#id# .label-hsc#id# {
-      background-color: var(--color-hsc#id#);
-      color: var(--color-txt-hsc#id#);
+    .texte#uid# .label-hsc#uid#, .bar-hsc#uid# {
+      background-color: var(--color-hsc#uid#) !important;
+      color: var(--color-txt-hsc#uid#) !important;
     }
-    /* Type 0 */
-    .type0_#id# #bar1_#id# {
-      background-color: var(--color-hp#id#);
-      color: var(--color-txt-hp#id#);
-      width: calc(var(--width#id#) * 16);
-      border-radius: var(--border-radius#id#) 0px 0px var(--border-radius#id#);
+    .texte#uid# .bar-error#uid#, .bar-error#uid#,.texte#uid# .label-error#uid# {
+      background-size: 30px 30px;
+      background-image: linear-gradient(135deg, 
+        rgba(255, 0, 0, 0.5) 25%, 
+        rgba(255, 255, 255, 0.5) 25%, 
+        rgba(255, 255, 255, 0.5) 50%, 
+        rgba(255, 0, 0, 0.5) 50%, 
+        rgba(255, 0, 0, 0.5) 75%, 
+        rgba(255, 255, 255, 0.5) 75%, 
+        rgba(255, 255, 255, 0.5) 
+	  );
     }
-    .type0_#id# #bar2_#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
-      width: calc(var(--width#id#) * 3);
+    .radius#uid#{
+      border-radius: 0px var(--border-radius#uid#) var(--border-radius#uid#) 0px;
     }
-    .type0_#id# #bar3_#id# {
-      background-color: var(--color-hsc#id#);
-      color: var(--color-txt-hsc#id#);
-      width: calc(var(--width#id#) * 4);
-    }   
-    .type0_#id# #bar4_#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
-      width: calc(var(--width#id#) * 1);
-      border-radius: 0px var(--border-radius#id#) var(--border-radius#id#) 0px;
-    }
-    .type0_#id# .day-grid#id# div:nth-child(1) {
+    .type_#uid# .day-grid#uid# div:nth-child(1) {
       left: 0px;
     }
-    .type0_#id# .day-grid#id# div:nth-child(2) {
-      left: calc(var(--width#id#) * 16);
-    }
-    .type0_#id# .day-grid#id# div:nth-child(3) {
-      left: calc(var(--width#id#) * 19);
-    }
-    .type0_#id# .day-grid#id# div:nth-child(4) {
-      left: calc(var(--width#id#) * 23);
-    }
-    .type0_#id# .day-grid#id# div:nth-child(5) {
-      left: calc(var(--width#id#) * 24);
-    }
-    .type0_#id# .bar#id#:nth-child(1) {
+    .bar#uid#:first-child {
       border-right-width: 0px;
     }
-    .type0_#id# .bar#id#:nth-child(4) {
+    .bar#uid#:last-child {
       border-left-width: 0px;
     }
-    .type0_#id# .bar#id#:nth-child(2), .type0_#id# .bar#id#:nth-child(3) {
+    .bar#uid#:not(:first-child):not(:last-child) {
       border-left-width: 0px;
       border-right-width: 0px;
     }
-    /* Type 1 */
-    .type1_#id# #bar1_#id# {
-      background-color: var(--color-hp#id#);
-      color: var(--color-txt-hp#id#);
-      width: calc(var(--width#id#) * 5);
-      border-radius: var(--border-radius#id#) 0px 0px var(--border-radius#id#);
-    }
-    .type1_#id# #bar2_#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
-      width: calc(var(--width#id#) * 1.5);
-    }
-    .type1_#id# #bar3_#id# {
-      background-color: var(--color-hp#id#);
-      color: var(--color-txt-hp#id#);
-      width: calc(var(--width#id#) * 11.5);
-    }
-    .type1_#id# #bar4_#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
-      width: calc(var(--width#id#) * 6);
-      border-radius: 0px var(--border-radius#id#) var(--border-radius#id#) 0px;
-    }
-    .type1_#id# .day-grid#id# div:nth-child(1){
-      left: 0px;
-    }
-    .type1_#id# .day-grid#id# div:nth-child(2){
-      left: calc(var(--width#id#) * 5);
-    }
-    .type1_#id# .day-grid#id# div:nth-child(3){
-      left: calc(var(--width#id#) * 6.5);
-    }
-    .type1_#id# .day-grid#id# div:nth-child(4){
-      left: calc(var(--width#id#) * 18);
-    }
-    .type1_#id# .day-grid#id# div:nth-child(5){
-      left: calc(var(--width#id#) * 24);
-    }
-    .type1_#id# .bar#id#:nth-child(1) {
-      border-right-width: 0px;
-    }
-    .type1_#id# .bar#id#:nth-child(4) {
-      border-left-width: 0px;
-    }
-    .type1_#id# .bar#id#:nth-child(2), .type1_#id# .bar#id#:nth-child(3) {
-      border-left-width: 0px;
-      border-right-width: 0px;
-    }
-    /* type 2 */
-    .type2_#id# #bar1_#id#, .type3_#id# #bar1_#id# {
-      background-color: var(--color-hp#id#);
-      color: var(--color-txt-hp#id#);
-      width: calc(var(--width#id#) * 16);
-      border-radius: var(--border-radius#id#) 0px 0px var(--border-radius#id#);
-    }
-    .type2_#id# #bar2_#id#, .type3_#id# #bar2_#id# {
-      background-color: var(--color-hc#id#);
-      color: var(--color-txt-hc#id#);
-      width: calc(var(--width#id#) * 8);
-      border-radius:  0px var(--border-radius#id#) var(--border-radius#id#) 0px;
-    }
-    .type2_#id# .day-grid#id# div:nth-child(1), .type3_#id# .day-grid#id# div:nth-child(1){
-      left: 0px;
-    }
-    .type2_#id# .day-grid#id# div:nth-child(2), .type3_#id# .day-grid#id# div:nth-child(2){
-      left: calc(var(--width#id#) * 16);
-    }
-    .type2_#id# .day-grid#id# div:nth-child(3), .type3_#id# .day-grid#id# div:nth-child(3){
-      left: calc(var(--width#id#) * 24);
-    }
-    .type2_#id# .bar#id#:nth-child(1), .type3_#id# .bar#id#:nth-child(1) {
-      border-right-width: 0px;
-    }
-    .type2_#id# .bar#id#:nth-child(2), .type3_#id# .bar#id#:nth-child(2) {
-      border-left-width: 0px;
-    }
+    .diagonal-text#uid# {
+      transform: rotate(var(--diagonal-text#uid#));
+      transform-origin: 0 0;
+      white-space: nowrap;
+	}
   </style>
 </div>
