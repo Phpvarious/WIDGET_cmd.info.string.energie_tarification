@@ -26,17 +26,26 @@
     <div>labels : Définition des plages horaires. (défaut : HP|HC|HSC|HC)</div>
     <div>diagonalText : Angle de l'heure des plages horaires, ex : 45 pour 45 degrés d'inclinaison. (défaut : 0)</div>
     <div>&nbsp;</div>
-    <div>//////////////////////////////////</div>
+    <div>///////////// Exemple 1 ////////////////</div>
     <div>│────── HP ──────│─── HC ──│──── HSC ────│── HC ──│</div>
     <div>7h ───────────── 23h ────── 2h ────────── 6h ───── 7h</div>
     <div>&nbsp;</div>
-    <div>//////////////////////////////////</div>
+    <div>timeslots : 7h|23h|2h|6h</div>
+    <div>labels : HP|HC|HSC|HC</div>
+    <div>&nbsp;</div>
+    <div>///////////// Exemple 2 ////////////////</div>
     <div>│──── HP ────│── HC ──│────── HP ─────│──── HC ───│</div>
     <div>7h30 ─────── 12h30 ─── 14h ──────────── 1h30 ────── 7h30</div>
     <div>&nbsp;</div>
-    <div>//////////////////////////////////</div>
+    <div>timeslots : 7h30|12h30|14h|1h30</div>
+    <div>labels : HP|HC|HP|HC</div>
+    <div>&nbsp;</div>
+    <div>///////////// Exemple 3 ////////////////</div>
     <div>│───────────── HP ────────────│────── HC ──────│</div>
     <div>6h ────────────────────────── 22h ───────────── 6h </div>
+    <div>&nbsp;</div>
+    <div>timeslots : 6h|22h</div>
+    <div>labels : HP|HC</div>
   </template>
   
   <div id="typeBar#uid#" class="graph#uid# type_#uid#" style="margin: 10px;text-align: left;">
